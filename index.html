@@ -1,0 +1,59 @@
+<!doctype>
+<html>
+<head>
+  <title>Retro JoyStick</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="./styles/retro-joystick.css" />
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
+  <script src="./js/retro-joystick-backup.js"></script>
+
+  <script>
+    $(document).ready(function () {
+
+      var retroJoyStick = new RetroJoyStick();
+
+      // When joystick has changed position
+      retroJoyStick.on('change', function () {
+
+        $('#retrostick-data-table-angle').html(retroJoyStick.angle);
+        $('#retrostick-data-table-distance').html(retroJoyStick.distance);
+
+      });
+
+      // For playing around with
+      window.retroJoyStick = retroJoyStick;
+
+    });
+  </script>
+</head>
+<body>
+
+  <div id="retrostick">
+    <div id="retrostick-base-bevel">
+    <div id="retrostick-base">
+      <div id="retrostick-base-joint">
+          <div><div></div></div>
+      </div>
+      <span class="direction-note direction-forward-left">left</span>
+      <span class="direction-note direction-forward">forward</span>
+      <span class="direction-note direction-forward-right">right</span>
+      <div id="retrostick-rod-wrap">
+        <div id="retrostick-rod"></div>
+      </div>
+      <div id="retrostick-ball"></div>
+      <span class="direction-note direction-backward-left">left</span>
+      <span class="direction-note direction-backward">backward</span>
+      <span class="direction-note direction-backward-right">right</span>
+    </div>
+    </div>
+  </div>
+
+  <table id="retrostick-data-table">
+    <tr><th>name</th><th>value</th></tr>
+    <tr><td>angle</td><td id="retrostick-data-table-angle"></td></tr>
+    <tr><td>Distance</td><td id="retrostick-data-table-distance"></td></tr>
+  </table>
+
+</body>
+</html>
