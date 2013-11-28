@@ -1,5 +1,6 @@
 body {
-  background: #0F6FA1 url(http://www.twitterevolutions.com/bgs/space.jpg) bottom;
+  background-color:black;
+  /*background: #0F6FA1 url(http://www.twitterevolutions.com/bgs/space.jpg) bottom;*/
   background-repeat: repeat-x;
   overflow:hidden;
 }
@@ -59,7 +60,7 @@ body {
   left: 560px;
 }
 
-#retrostick-rod-wrap {
+#retrostick-stick-wrap {
   width: 150px;
   height: 150px;
   -webkit-transform-origin: 77px 145px;
@@ -68,7 +69,7 @@ body {
   left: 0px;
 }
 
-#retrostick-rod {
+#retrostick-stick {
   width: 15px;
   height: 5px;
   background: linear-gradient(to right, #e2e2e2 0%,#dbdbdb 50%,#d1d1d1 51%,#fefefe 100%);
@@ -120,5 +121,15 @@ body {
 #retrostick-data-table th,
 #retrostick-data-table td {
   padding:0;
+}
+
+.bringBallToCenter {
+  -webkit-transition: all 0.3s ease-out;
+  background-color:red;
+}
+
+.shrinkstickToCenter {
+  -webkit-transition: height 0.3s ease-out;
+  background-color:red;
 }
 

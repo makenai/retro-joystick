@@ -1,179 +1,156 @@
 /*
-
    @TODO:
 
-     [ ] restrain to center circle of 100 pixels
+     [x] restrain to center circle of 100 pixels
 
-     [ ] snap to center when releasing
+     [x] snap to center when releasing
 
-     [ ] animate back to center when releasing
+     [x] animate back to center when releasing
 
-     [ ] snap to center X +-20px
+     [x] cleanup and watch performance.
 
-     [ ] snap to center Y +-20px
+     [x] snap to center X +-20px
+
+     [x] snap to center Y +-20px
+
+     [ ] increase resistance of pulling when at 75 +
 
      [ ] distance setter changes knob position
 
      [ ] angle setter changes knob position
 
 */
+
+var MAX_DISTANCE = 100;
+
 function RetroJoyStick() {
-
-  var ball = $('#retrostick-ball');
-  var rod = $('#retrostick-rod');
-  var rodWrap = $('#retrostick-rod-wrap');
-  var base = $('#retrostick-base');
-  var doc = $(document);
-
-  var ballOffset;
-  var currentPos;
-  var clickOffset;
-  var posX, posY, _posX, _posY;
-
-  var ballWidth = ball.width();
-  var ballHeight = ball.height();
-
-  var baseWidth = base.width();
-  var baseHeight = base.height();
-
-  var retroStickAreaMaxTop = 0;
-  var retroStickAreaMaxLeft = 0;
-  var retroStickAreaMaxRight = baseWidth;
-  var retroStickAreaMaxBottom = baseHeight;
-
-  var point;
-  var centerPoint = {x: baseWidth / 2, y: baseHeight / 2};
-
-  ball.on('mousedown.retrostick', handleRetroStickPress);
 
   var self = this;
 
-  function getDistance(point1, point2) {
-    var xs = (point1.x - point2.x) * (point1.x - point2.x);
-    var ys = (point1.y - point2.y) * (point1.y - point2.y);
+  // options
+  self.snapping = true;
 
-    return Math.floor(Math.sqrt(xs + ys));
-  }
+  var doc = $(document);
+  var ball = $('#retrostick-ball');
+  var stick = $('#retrostick-stick');
+  var stickWrap = $('#retrostick-stick-wrap');
+  var base = $('#retrostick-base');
 
+  // private variables used in public methods
+  this._ball = ball;
+  this._stick = stick;
 
-  // http://stackoverflow.com/questions/16792841/detect-if-user-clicks-inside-a-circle
-  // x,y is the point to test
-  // cx, cy is circle center, and radius is circle radius
-  function pointInCircle(x, y, cx, cy, radius) {
-    var distancesquared = (x - cx) * (x - cx) + (y - cy) * (y - cy);
-    return distancesquared <= radius * radius;
-  }
+  // Scoped to the constructor, mostly for sharing in between mouse events
+  var ballOffset,
+      currentPos,
+      clickOffset,
+      point,
+      lastPointX,
+      lastPointY,
+      lastDistance,
+      lastAngle;
+
+  // stuff
+  var ballWidth = ball.width();
+  var ballHeight = ball.height();
+  var baseWidth = base.width();
+  var baseHeight = base.height();
+  var ballRadius = ballWidth / 2;
+
+  // couldn't live without it
+  var centerPoint = {x: baseWidth / 2, y: baseHeight / 2};
 
   function handleRetroStickMove(e) {
 
-    _posX = e.clientX - ballOffset.left + currentPos.left- clickOffset.left + (ballHeight / 2);
-    _posY = e.clientY - ballOffset.top + currentPos.top - clickOffset.top + (ballWidth / 2);
-
-    var posChanged = false;
-
-    //if (pointInCircle(_posX, _posY, centerPoint.x, centerPoint.y, 100)) {
-
-      //ball.css('top', posY - (ballHeight / 2));
-      //ball.css('left', posX - (ballWidth / 2));
-
-      //posY = _posY;
-      //posX = _posX;
-      //posChanged = true;
-    //}
-
-
-    point = {x: posX, y: posY};
+    point = {
+      x: e.clientX - ballOffset.left + currentPos.left- clickOffset.left + ballRadius,
+      y: e.clientY - ballOffset.top + currentPos.top - clickOffset.top + ballRadius
+    };
 
     // Get distance from center
-    var distance = getDistance(point, centerPoint);
-
-    // Set distance (triggers setter)
-    self.distance = distance;
+    self.distance = getDistance(point, centerPoint);
 
     // Get angle from center (0-360)
-    var theta = Math.atan2(posY - Math.floor(baseHeight / 2), posX - Math.floor(baseWidth / 2));
+    var theta = Math.atan2(point.y - centerPoint.y, point.x - centerPoint.x);
     if(theta < 0) theta += 2 * Math.PI;
     var _angle = (theta * 180 / Math.PI + 90 ) % 360;
 
     // Set angle (triggers setter)
     self.angle = _angle;
 
-    self.publish('change');
+    // Constrain the point within a circle
+    var limitedPoint = limit(point, centerPoint);
 
-    //if (distance <= 100) {
-      ball.css('top', posY - (ballHeight / 2));
-      ball.css('left', posX - (ballWidth / 2));
+    // Snapping is enabled
+    if (self.snapping) {
 
-      posY = _posY;
-      posX = _posX;
-      posChanged = true;
+      var snap = 8; // @TODO: add public option
 
-      /** Converts numeric degrees to radians */
-      if (typeof(Number.prototype.toRad) === "undefined") {
-        Number.prototype.toRad = function() {
-          return this * Math.PI / 180;
-        }
+      // Snap to the center
+      if (self.distance < snap) {
+        self.angle = 0;
+        limitedPoint.x = centerPoint.x;
+        limitedPoint.y = centerPoint.y;
       }
 
+      // Snap on 0 angle
+      if (_angle > 360 - snap || (_angle > 0 && _angle < snap)) {
+        self.angle = 0;
+        limitedPoint.x = centerPoint.x;
+      }
 
-      // given angle (as a radian) and a distance away from the center, i am
-      // trying to find the X/Y position
-      //
-      // i am want to output the coordinates of
+      // Snap on 90 angle
+      if (_angle > 90 - snap && _angle < 90 + snap) {
+        self.angle = 90;
+        limitedPoint.y = centerPoint.y;
+      }
 
+      // Snap on 180 angle
+      if (_angle > 180 - snap && _angle < 180 + snap) {
+        self.angle = 180;
+        limitedPoint.x = centerPoint.x;
+      }
 
-      var cosAngle = Math.cos(_angle.toRad());
-      var sinAngle = Math.sin(_angle.toRad());
+      // Snap on 270 angle
+      if (_angle > 270 - snap && _angle < 270 + snap) {
+        self.angle = 270;
+        limitedPoint.y = centerPoint.y;
+      }
+    } // End snapping
 
-      //console.log('position', distance + (cosAngle * distance), distance + (sinAngle * distance));
+    var changed = false;
 
-      // <inf-groupoid> Let (x0,y0) be the coordinates of the center of the circle.
-      // <inf-groupoid> Let r be the distance away from the center.
-      // "x = x0 + r*cos(t)" and "y = y0 + r*sin(t)", where t is the angle.
+    if (limitedPoint.y !== lastPointY) {
+      ball.css('top', limitedPoint.y - (ballHeight / 2));
+      lastPointY = limitedPoint.y;
+      changed = true;
+    }
 
-      var x = centerPoint.x + distance * cosAngle;
-      var y = centerPoint.y + distance * sinAngle;
+    if (limitedPoint.x !== lastPointX) {
+      ball.css('left', limitedPoint.x - ballRadius);
+      lastPointX = limitedPoint.x;
+      changed = true;
+    }
 
-      console.log('position', x, y);
+    if (self._angle !== lastAngle) {
+      // Change stick angle according to where the ball has rotated
+      stickWrap.css('-webkit-transform', 'rotate(' + self._angle + 'deg)');
+      lastAngle = self._angle;
+      changed = true;
+    }
 
-      // Change rod angle according to where the ball has rotated
-      rodWrap.css('-webkit-transform', 'rotate(' + _angle + 'deg)');
+    // Change stick height so it reaches the ball
+    if (self.distance !== lastDistance) {
+      stick.height(self.distance);
+      changed = true;
+    }
 
-      // Change rod height so it reaches the ball
-      rod.height(distance);
-    //}
-    //else {
-
-      //ball.css('top', posY - (ballHeight / 2));
-      //ball.css('left', posX - (ballWidth / 2));
-
-      //posY = _posY;
-      //posX = _posX;
-      //posChanged = true;
-
-      //// Change rod angle according to where the ball has rotated
-      //rodWrap.css('-webkit-transform', 'rotate(' + angle + 'deg)');
-
-      //[>* Converts numeric degrees to radians <]
-      //if (typeof(Number.prototype.toRad) === "undefined") {
-        //Number.prototype.toRad = function() {
-          //return this * Math.PI / 180;
-        //}
-      //}
-
-      //var cosAngle = Math.cos(angle.toRad());
-      //var sinAngle = Math.sin(angle.toRad());
-
-      //console.log('wut', 100 * cosAngle, 100 * sinAngle);
-
-      //// Change rod height so it reaches the ball
-      //rod.height(100);
-
-    //}
+    if (changed) {
+      self.publish('change');
+    }
 
     e.preventDefault();
   }
-
 
   function handleRetroStickPress(e) {
 
@@ -181,14 +158,21 @@ function RetroJoyStick() {
     currentPos = ball.position();
     clickOffset = {left: e.clientX - ballOffset.left, top: e.clientY - ballOffset.top};
 
+    // Remove animation classes (only used for when releasing)
+    self._ball.removeClass('bringBallToCenter');
+    self._stick.removeClass('shrinkstickToCenter');
+
     doc.on('mousemove.retrostick', handleRetroStickMove);
 
     doc.on('mouseup.retrostick', function () {
-      $(document).off('mousemove.retrostick');
+      self.resetPosition();
+      doc.off('mousemove.retrostick');
     });
 
     e.preventDefault();
   }
+
+  ball.on('mousedown.retrostick', handleRetroStickPress);
 
 }
 
@@ -199,6 +183,9 @@ RetroJoyStick.prototype = {
     },
 
     set angle(val){
+      // Change stick angle according to where the ball has rotated
+      //stickWrap.css('-webkit-transform', 'rotate(' + _angle + 'deg)');
+
       this._angle = Math.floor(val);
     },
 
@@ -206,14 +193,29 @@ RetroJoyStick.prototype = {
       return this._distance;
     },
 
-    set distance(val){
-      this._distance = val;
+    set distance(distance){
+      // Make sure distance doesn't go further than the max.
+      if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
+      this._distance = distance;
+
+      //this._ball.css('top', val.y - ballRadius);
+      //this._ball.css('left', val.x - ballRadius);
     }
 
 };
 
-// https://gist.github.com/deshawnbw/7521966
+RetroJoyStick.prototype.resetPosition = function () {
+  this._ball.addClass('bringBallToCenter');
+  this._ball.css('top', 50);
+  this._ball.css('left', 50);
+  this._stick.addClass('shrinkstickToCenter');
+  this._stick.height(5);
+  this.angle = 0;
+  this.distance = 0;
+  this.publish('change');
+};
 
+// https://gist.github.com/deshawnbw/7521966
 RetroJoyStick.prototype.publish = function(topic, args){
   var self = this;
   if (this._eventCache && this._eventCache[topic]) {
@@ -229,7 +231,7 @@ RetroJoyStick.prototype.subscribe = function (topic, callback) {
   this._eventCache[topic].push(callback);
 
   return [topic, callback];
-}
+};
 
 RetroJoyStick.prototype.on = RetroJoyStick.prototype.subscribe;
 
@@ -245,4 +247,32 @@ RetroJoyStick.prototype.unsubscribe = function(handle){
     });
   }
 };
+
+
+function getDistance(point1, point2) {
+  var xs = (point1.x - point2.x) * (point1.x - point2.x);
+  var ys = (point1.y - point2.y) * (point1.y - point2.y);
+
+  return Math.floor(Math.sqrt(xs + ys));
+}
+
+// http://stackoverflow.com/questions/8515900/how-to-constrain-movement-within-the-area-of-a-circle
+// http://jsfiddle.net/7Asn6/
+function limit(point, centerPoint) {
+  if (centerPoint.x) {
+  var dist = getDistance(point, centerPoint);
+  if (dist <= centerPoint.x) { // radius
+      return point;
+  } 
+  else {
+    x = point.x - centerPoint.x;
+    y = point.y - centerPoint.y;
+    var radians = Math.atan2(y, x);
+       return {
+           x: Math.cos(radians) * centerPoint.x + centerPoint.x,
+           y: Math.sin(radians) * centerPoint.y + centerPoint.y
+       };
+  }
+  }
+}
 
