@@ -1,34 +1,23 @@
 /*
    @TODO:
 
-     [x] restrain to center circle of 100 pixels
-
-     [x] snap to center when releasing
-
-     [x] animate back to center when releasing
-
-     [x] cleanup and watch performance.
-
-     [x] snap to center X +-20px
-
-     [x] snap to center Y +-20px
-
      [ ] increase resistance of pulling when at 75 +
 
      [ ] distance setter changes knob position
 
      [ ] angle setter changes knob position
-
 */
 
 var MAX_DISTANCE = 100;
 
-function RetroJoyStick() {
+function RetroJoyStick(options) {
+
+  options = options || {};
 
   var self = this;
 
   // options
-  self.snapping = true;
+  self.snapping = options.snapping || true;
 
   var doc = $(document);
   var ball = $('#retrostick-ball');
@@ -159,8 +148,8 @@ function RetroJoyStick() {
     clickOffset = {left: e.clientX - ballOffset.left, top: e.clientY - ballOffset.top};
 
     // Remove animation classes (only used for when releasing)
-    self._ball.removeClass('bringBallToCenter');
-    self._stick.removeClass('shrinkstickToCenter');
+    self._ball.removeClass('retrostick-ball-to-center');
+    self._stick.removeClass('retrostick-stick-to-center');
 
     doc.on('mousemove.retrostick', handleRetroStickMove);
 
