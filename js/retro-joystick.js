@@ -8,8 +8,6 @@
      [ ] angle setter changes knob position
 */
 
-var MAX_DISTANCE = 100;
-
 function RetroJoyStick(options) {
 
   options = options || {};
@@ -17,7 +15,17 @@ function RetroJoyStick(options) {
   var self = this;
 
   // options
+
+  // Should there be snapping?
   self.snapping = options.snapping || true;
+
+  // What amount of pixels should we snap to?
+  self.snappingPixels = options.snappingPixels || 8;
+
+  // How far away from the center of the joystick
+  self.maxDistanceFromCenter = options.maxDistanceFromCenter || 100;
+
+  self.speedAdjustment = options.speedAdjustment || 0.08;
 
   var doc = $(document);
   var ball = $('#retrostick-ball');
@@ -39,32 +47,37 @@ function RetroJoyStick(options) {
       lastDistance,
       lastAngle;
 
-  // stuff
+  // dimension based calculations
   var ballWidth = ball.width();
   var ballHeight = ball.height();
   var baseWidth = base.width();
   var baseHeight = base.height();
   var ballRadius = ballWidth / 2;
 
-  // couldn't live without it
+  // couldn't live without it, no way, oh no.
   var centerPoint = {x: baseWidth / 2, y: baseHeight / 2};
 
+  // When we are moving around the joystick.
   function handleRetroStickMove(e) {
 
+    // get the position of the joystick
     point = {
       x: e.clientX - ballOffset.left + currentPos.left- clickOffset.left + ballRadius,
       y: e.clientY - ballOffset.top + currentPos.top - clickOffset.top + ballRadius
     };
 
-    // Get distance from center
+    // publicize the distance from center
     self.distance = getDistance(point, centerPoint);
 
     // Get angle from center (0-360)
     var theta = Math.atan2(point.y - centerPoint.y, point.x - centerPoint.x);
+
     if(theta < 0) theta += 2 * Math.PI;
+
+    // Determine the angle of the joystick
     var _angle = (theta * 180 / Math.PI + 90 ) % 360;
 
-    // Set angle (triggers setter)
+    // publicize the angle (triggers setter)
     self.angle = _angle;
 
     // Constrain the point within a circle
@@ -73,7 +86,8 @@ function RetroJoyStick(options) {
     // Snapping is enabled
     if (self.snapping) {
 
-      var snap = 8; // @TODO: add public option
+      // amount of pixels to snap to.
+      var snap = self.snappingPixels;
 
       // Snap to the center
       if (self.distance < snap) {
@@ -124,6 +138,7 @@ function RetroJoyStick(options) {
     if (self._angle !== lastAngle) {
       // Change stick angle according to where the ball has rotated
       stickWrap.css('-webkit-transform', 'rotate(' + self._angle + 'deg)');
+      stickWrap.css('-moz-transform', 'rotate(' + self._angle + 'deg)');
       lastAngle = self._angle;
       changed = true;
     }
@@ -141,13 +156,15 @@ function RetroJoyStick(options) {
     e.preventDefault();
   }
 
+  // When we press down on the joystick ball.
   function handleRetroStickPress(e) {
 
+    // Notate some shit
     ballOffset = ball.offset();
     currentPos = ball.position();
     clickOffset = {left: e.clientX - ballOffset.left, top: e.clientY - ballOffset.top};
 
-    // Remove animation classes (only used for when releasing)
+    // Remove animation classes (from previous press)
     self._ball.removeClass('retrostick-ball-to-center');
     self._stick.removeClass('retrostick-stick-to-center');
 
@@ -172,9 +189,6 @@ RetroJoyStick.prototype = {
     },
 
     set angle(val){
-      // Change stick angle according to where the ball has rotated
-      //stickWrap.css('-webkit-transform', 'rotate(' + _angle + 'deg)');
-
       this._angle = Math.floor(val);
     },
 
@@ -184,12 +198,32 @@ RetroJoyStick.prototype = {
 
     set distance(distance){
       // Make sure distance doesn't go further than the max.
-      if (distance > MAX_DISTANCE) distance = MAX_DISTANCE;
+      if (distance > this.maxDistanceFromCenter) distance = this.maxDistanceFromCenter;
       this._distance = distance;
-
-      //this._ball.css('top', val.y - ballRadius);
-      //this._ball.css('left', val.x - ballRadius);
     }
+
+};
+
+RetroJoyStick.prototype.getPositionAdjustment = function () {
+
+  var angle = angle || this.angle;
+  var distance = distance || this.distance;
+
+  distance *= this.speedAdjustment;
+
+  angle = angle - 90;
+  if (angle < 0) {
+    angle = Math.abs(angle) + 270;
+  }
+
+  var radian = angle * Math.PI / 180;
+  var cosAngle = Math.cos(radian);
+  var sinAngle = Math.sin(radian);
+
+  var x = Math.floor(cosAngle * distance);
+  var y = Math.floor(sinAngle * distance);
+
+  return {x: x, y: y};
 
 };
 

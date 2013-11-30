@@ -14,11 +14,40 @@
 
       var retroJoyStick = new RetroJoyStick();
 
+      var distance = 0;
+      var angle = 0;
+
       // When joystick has changed position
       retroJoyStick.on('change', function () {
-        $('#retrostick-data-table-angle').html(retroJoyStick.angle);
-        $('#retrostick-data-table-distance').html(retroJoyStick.distance);
+        // keep track of distance
+        distance = retroJoyStick.distance
+
+        // keep track of angle
+        angle = retroJoyStick.angle
+
+        // notate when angle / distance changes
+        $('#retrostick-data-table-angle').html(angle);
+        $('#retrostick-data-table-distance').html(distance);
       });
+
+      // get the nyan cat
+      var nyanCat = $('#nyanCat');
+
+      function animateCat() {
+
+        // notate position of nyanCat
+        var nyanCatPos = nyanCat.position();
+
+        // according to joystick, how much should the nyan cat move?
+        var positionAdjustment = retroJoyStick.getPositionAdjustment();
+
+        // move the nyan can according to th ejoystick movement
+        nyanCat.css('left', nyanCatPos.left + (positionAdjustment.x));
+        nyanCat.css('top', nyanCatPos.top + (positionAdjustment.y));
+
+      }
+
+      setInterval(animateCat, 25);
 
       // For playing around with
       window.retroJoyStick = retroJoyStick;
@@ -26,6 +55,11 @@
   </script>
 </head>
 <body>
+  <div class="github-fork-ribbon-wrapper right">
+    <div class="github-fork-ribbon">
+      <a href="https://github.com/deshawnbw/retro-joystick">Fork me on GitHub</a>
+    </div>
+  </div>
 
   <div id="retrostick">
     <div id="retrostick-base-bevel">
@@ -87,6 +121,8 @@
       <div class="rainbow r3"></div>
       <div class="rainbow r4"></div>
   </div>
+
+  <img src="./assets/images/joystick.png" class="screenshot"/>
 
 </body>
 </html>
