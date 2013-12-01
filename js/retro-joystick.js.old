@@ -8,11 +8,14 @@
      [ ] angle setter changes knob position
 */
 
+var joystickId = 0;
+
 function RetroJoyStick(options) {
 
   options = options || {};
 
   var self = this;
+
 
   // options
 
@@ -27,11 +30,24 @@ function RetroJoyStick(options) {
 
   self.speedAdjustment = options.speedAdjustment || 0.08;
 
+  if (options.position) {
+    self.position = options.position;
+  }
+  else {
+    self.position = 'bottom_left';
+  }
+
+  self.joystickId = ++joystickId;
+
+  self.insertJoystickMarkup();
+
+  var wrap = $('#retrostick-' + self.joystickId);
+
   var doc = $(document);
-  var ball = $('#retrostick-ball');
-  var stick = $('#retrostick-stick');
-  var stickWrap = $('#retrostick-stick-wrap');
-  var base = $('#retrostick-base');
+  var ball = wrap.find('.retrostick-ball');
+  var stick = wrap.find('.retrostick-stick');
+  var stickWrap = wrap.find('.retrostick-stick-wrap');
+  var base = wrap.find('.retrostick-base');
 
   // private variables used in public methods
   this._ball = ball;
@@ -202,6 +218,54 @@ RetroJoyStick.prototype = {
       this._distance = distance;
     }
 
+};
+
+RetroJoyStick.prototype.insertJoystickMarkup = function () {
+
+  var wrap = document.createElement('div');
+  wrap.setAttribute('id', 'retrostick-' + self.joystickId);
+  wrap.className = 'retrostick';
+
+  wrap.innerHTML = '\
+      <div class="retrostick-base">\
+        <div class="retrostick-base-joint">\
+            <div><div></div></div>\
+        </div>\
+        <span class="retrostick-dir-note retrostick-dir-forward-left">left</span>\
+        <span class="retrostick-dir-note retrostick-dir-forward">forward</span>\
+        <span class="retrostick-dir-note retrostick-dir-forward-right">right</span>\
+        <div class="retrostick-stick-wrap">\
+          <div class="retrostick-stick"></div>\
+        </div>\
+        <div class="retrostick-ball"></div>\
+        <span class="retrostick-dir-note retrostick-dir-backward-left">left</span>\
+        <span class="retrostick-dir-note retrostick-dir-backward">backward</span>\
+        <span class="retrostick-dir-note retrostick-dir-backward-right">right</span>\
+      </div>\
+  ';
+
+  if (this.position == 'bottom_left') {
+    $(wrap).addClass('retrostick-bottom-left');
+  }
+
+  if (this.position == 'bottom_right') {
+    $(wrap).addClass('retrostick-bottom-right');
+  }
+
+  if (this.position == 'top_left') {
+    $(wrap).addClass('retrostick-top-left');
+  }
+
+  if (this.position == 'top_right') {
+    $(wrap).addClass('retrostick-top-right');
+  }
+
+  debugger;
+  this.publish('beforeInsert');
+
+  document.body.appendChild(wrap);
+
+  return wrap;
 };
 
 RetroJoyStick.prototype.getPositionAdjustment = function () {

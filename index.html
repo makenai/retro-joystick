@@ -5,81 +5,8 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <link rel="stylesheet" href="./styles/retro-joystick.css" />
   <link rel="stylesheet" href="./styles/retro-joystick-demo.css" />
-
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
-  <script src="./js/retro-joystick.js"></script>
-
-  <script>
-    $(document).ready(function () {
-
-      var retroJoyStick = new RetroJoyStick();
-
-      var distance = 0;
-      var angle = 0;
-
-      // When joystick has changed position
-      retroJoyStick.on('change', function () {
-        // keep track of distance
-        distance = retroJoyStick.distance
-
-        // keep track of angle
-        angle = retroJoyStick.angle
-
-        // notate when angle / distance changes
-        $('#retrostick-data-table-angle').html(angle);
-        $('#retrostick-data-table-distance').html(distance);
-      });
-
-      // get the nyan cat
-      var nyanCat = $('#nyanCat');
-
-      function animateCat() {
-
-        // notate position of nyanCat
-        var nyanCatPos = nyanCat.position();
-
-        // according to joystick, how much should the nyan cat move?
-        var positionAdjustment = retroJoyStick.getPositionAdjustment();
-
-        // move the nyan can according to th ejoystick movement
-        nyanCat.css('left', nyanCatPos.left + (positionAdjustment.x));
-        nyanCat.css('top', nyanCatPos.top + (positionAdjustment.y));
-
-      }
-
-      setInterval(animateCat, 25);
-
-      // For playing around with
-      window.retroJoyStick = retroJoyStick;
-    });
-  </script>
 </head>
 <body>
-  <div class="github-fork-ribbon-wrapper right">
-    <div class="github-fork-ribbon">
-      <a href="https://github.com/deshawnbw/retro-joystick">Fork me on GitHub</a>
-    </div>
-  </div>
-
-  <div id="retrostick">
-    <div id="retrostick-base-bevel">
-    <div id="retrostick-base">
-      <div id="retrostick-base-joint">
-          <div><div></div></div>
-      </div>
-      <span class="retrostick-dir-note retrostick-dir-forward-left">left</span>
-      <span class="retrostick-dir-note retrostick-dir-forward">forward</span>
-      <span class="retrostick-dir-note retrostick-dir-forward-right">right</span>
-      <div id="retrostick-stick-wrap">
-        <div id="retrostick-stick"></div>
-      </div>
-      <div id="retrostick-ball"></div>
-      <span class="retrostick-dir-note retrostick-dir-backward-left">left</span>
-      <span class="retrostick-dir-note retrostick-dir-backward">backward</span>
-      <span class="retrostick-dir-note retrostick-dir-backward-right">right</span>
-    </div>
-    </div>
-  </div>
 
   <table id="retrostick-data-table">
     <tr><th>name</th><th>value</th></tr>
@@ -87,42 +14,72 @@
     <tr><td>Distance</td><td id="retrostick-data-table-distance"></td></tr>
   </table>
 
-  <div id="nyanCat">
-      <div id="wholeHead">
-          <div class="skin ear"></div>
-          <div class="skin ear rightEar"></div>
-          <div id="mainHead" class="skin">
-              <div class="eye"></div>
-              <div class="eye rightEye"></div>
-              <div class="nose"></div>
-              <div class="chick"></div>
-              <div class="chick rightChick"></div>
-              <div class="mouth">E</div>
-          </div>
-      </div>
-      <div id="toastBody">
-          <div>
-              &nbsp;  &nbsp; &nbsp;.&nbsp;&nbsp;.&nbsp; &nbsp; &nbsp;..&nbsp;  &nbsp; &nbsp;.&nbsp;.&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;..&nbsp;  &nbsp; &nbsp;.&nbsp;&nbsp;.
-          </div>
-      </div>
-      <div id="wholeTail">
-          <div class="tail skin"></div>
-          <div class="tail middleTail skin"></div>
-          <div class="tail backTail skin"></div>
-      </div>
-      <div id="allYourLegAreBelongToUs">
-          <div class="skin leg back leftBack"></div>
-          <div class="skin leg back"></div>
-          <div class="skin leg front leftFront"></div>
-          <div class="skin leg front"></div>
-      </div>
-      <div class="rainbow"></div>
-      <div class="rainbow r2"></div>
-      <div class="rainbow r3"></div>
-      <div class="rainbow r4"></div>
-  </div>
+  <script type="text/javascript" src="./js/jquery.js" ></script>
+  <script type="text/javascript" src="./js/RetroJoyStick.js"></script>
+  <script type="text/javascript" src="./js/NyanCatSprite.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+
+      var retroJoyStick1 = new RetroJoyStick({
+        position: 'bottom_right'
+      });
+
+      var retroJoyStick2 = new RetroJoyStick({
+        position: 'bottom_left'
+      });
+
+      var distance = 0;
+      var angle = 0;
+      // When joystick has changed position
+      retroJoyStick1.on('change', function () {
+        // keep track of distance
+        distance = retroJoyStick1.distance
+        // keep track of angle
+        angle = retroJoyStick1.angle
+        // notate when angle / distance changes
+        $('#retrostick-data-table-angle').html(angle);
+        $('#retrostick-data-table-distance').html(distance);
+      });
+
+      var nyanCat1 = new NyanCatSprite();
+      var nyanCat2 = new NyanCatSprite();
+
+      function animateCat() {
+        var nyanCatPos;
+
+        // according to joystick1, how much should the nyan cat move?
+        var positionAdjustment1 = retroJoyStick1.getPositionAdjustment();
+        if (positionAdjustment1.x || positionAdjustment1.y) {
+          nyanCatPos = nyanCat1.position();
+          nyanCat1.css('left', nyanCatPos.left + (positionAdjustment1.x));
+          nyanCat1.css('top', nyanCatPos.top + (positionAdjustment1.y));
+        }
+
+        // according to joystick2, how much should the nyan cat move?
+        var positionAdjustment2 = retroJoyStick2.getPositionAdjustment();
+        if (positionAdjustment2.x || positionAdjustment2.y) {
+          nyanCatPos = nyanCat2.position();
+          nyanCat2.css('left', nyanCatPos.left + (positionAdjustment2.x));
+          nyanCat2.css('top', nyanCatPos.top + (positionAdjustment2.y));
+        }
+
+      }
+
+      setInterval(animateCat, 25);
+
+      // For playing around with
+      window.retroJoyStick1 = retroJoyStick1;
+    });
+  </script>
 
   <img src="./assets/images/joystick.png" class="screenshot"/>
+
+  <div class="github-fork-ribbon-wrapper right">
+    <div class="github-fork-ribbon">
+      <a href="https://github.com/deshawnbw/retro-joystick">Fork me on GitHub</a>
+    </div>
+  </div>
 
 </body>
 </html>

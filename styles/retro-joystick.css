@@ -1,4 +1,13 @@
-#retrostick-base {
+.retrostick {
+  position: absolute;
+  padding: 4px;
+  width: 151px;
+  height: 150px;
+  border-radius: 10px;
+  background: linear-gradient(38deg, #7d7e7d 25%,#0e0e0e 80%);
+}
+
+.retrostick-base {
   border-radius: 4px;
   position:relative;
   width:150px;
@@ -6,7 +15,7 @@
   background: linear-gradient(135deg, #7d7e7d 0%,#0e0e0e 100%); /* W3C */
 }
 
-#retrostick-base-joint {
+.retrostick-base-joint {
   position: absolute;
   top: 36px;
   left: 38px;
@@ -17,7 +26,7 @@
   border: 1px solid rgb(109, 109, 109);
 }
 
-#retrostick-base-joint > div{
+.retrostick-base-joint > div{
   position: absolute;
   top: 10px;
   left: 11px;
@@ -28,7 +37,7 @@
   border: 1px solid #4E4E4E;
 }
 
-#retrostick-base-joint > div > div{
+.retrostick-base-joint > div > div{
   width: 24px;
   height: 25px;
   background-color: rgba(0, 0, 0, 0.76);
@@ -39,17 +48,7 @@
   border: 1px solid #494949;
 }
 
-#retrostick-base-bevel {
-  position: absolute;
-  padding: 4px;
-  width: 151px;
-  border-radius: 10px;
-  background: linear-gradient(38deg, #7d7e7d 25%,#0e0e0e 80%);
-  top: 220px;
-  left: 560px;
-}
-
-#retrostick-stick {
+.retrostick-stick {
   width: 15px;
   height: 5px;
   background: linear-gradient(to right, #e2e2e2 0%,#dbdbdb 50%,#d1d1d1 51%,#fefefe 100%);
@@ -60,7 +59,7 @@
   box-shadow: 5px 3px 16px rgba(50, 50, 50, 0.63);
 }
 
-#retrostick-stick-wrap {
+.retrostick-stick-wrap {
   width: 150px;
   height: 150px;
   -webkit-transform-origin: 77px 145px;
@@ -72,7 +71,7 @@
   left: 0px;
 }
 
-#retrostick-ball {
+.retrostick-ball {
   position:absolute;
   top:50px;
   left:50px;
@@ -118,4 +117,10 @@
   -webkit-transition: height 0.3s ease-out;
   background-color:red;
 }
+
+// Joystick positioning options.
+.retrostick-bottom-left{bottom:25px; left: 25px;}
+.retrostick-bottom-right{bottom:25px; right:25px;}
+.retrostick-top-left{top:25px; left:25px;}
+.retrostick-top-right{top:25px; right:25px;}
 
