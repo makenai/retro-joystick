@@ -3,6 +3,10 @@ Retro Joystick
 
   A traditional joystick for web apps
 
+Screenshot
+=====================
+![alt text](https://github.com/deshawnbw/retro-joystick/raw/master/assets/images/screenshot.png "Screenshot")
+
 Check It Out
 =====================
   View a demo <a href="http://deshawnbw.github.io/retro-joystick/">online</a>
