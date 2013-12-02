@@ -1,9 +1,13 @@
 /*
    @TODO:
 
-     [ ] add support for multiple joysticks
+     [x] add support for multiple joysticks
 
-     [ ] add support for touch events
+     [x] add support for touch events
+
+     [x] add support for manipulating multiple joysticks
+
+     [ ] fix issue when releasing (caused by hack for handling multiple touch events)
 
      [ ] increase resistance of pulling when at 75 +
 
@@ -33,9 +37,9 @@ function RetroJoyStick(options) {
   self.speedAdjustment = options.speedAdjustment || 0.08;
 
   // @TODO:?
-  // arial or scrolling
+  // aerial or scrolling
   //
-  // arial (think helicopter):
+  // aerial (think helicopter):
   //   when forward is pushed, the object goes up.
   //
   // scrolling (think mario bros):
@@ -55,7 +59,6 @@ function RetroJoyStick(options) {
 
   var wrap = $('#retrostick-' + self.joystickId);
 
-  var doc = $(document);
   var ball = wrap.find('.retrostick-ball');
   var stick = wrap.find('.retrostick-stick');
   var stickWrap = wrap.find('.retrostick-stick-wrap');
@@ -186,19 +189,24 @@ function RetroJoyStick(options) {
   }
 
   function handleRetroStickUp(e, isTouch) {
-    self.resetPosition();
-    if (isTouch) {
-      document.removeEventListener('touchmove', handleTouchRetroStickMove, false);
-    }
-    else {
-      document.removeEventListener('mousemove', handleRetroStickMove, false);
+    if (e.target === self._ball[0]) {
+      self.resetPosition();
+      if (isTouch) {
+        document.removeEventListener('touchmove', handleTouchRetroStickMove, false);
+      }
+      else {
+        document.removeEventListener('mousemove', handleRetroStickMove, false);
+      }
     }
   }
 
   function handleTouchRetroStickMove(e) {
-    var touches = e.changedTouches;
-    for (var i = 0; i < touches.length; i++) {
-      handleRetroStickMove(touches[i], true);
+    if (e.target === self._ball[0]) {
+      var touches = e.changedTouches;
+      for (var i = 0; i < touches.length; i++) {
+        console.log(i);
+        handleRetroStickMove(touches[i], true);
+      }
     }
   }
 

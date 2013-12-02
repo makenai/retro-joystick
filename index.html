@@ -3,8 +3,9 @@
 <head>
   <title>Retro JoyStick</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link rel="stylesheet" href="./styles/retro-joystick.css?s" />
-  <link rel="stylesheet" href="./styles/retro-joystick-demo.css?s" />
+  <link rel="stylesheet" href="./styles/retro-joystick.css" />
+  <link rel="stylesheet" href="./styles/retro-joystick-demo.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 </head>
 <body>
 
@@ -16,57 +17,76 @@
 
   <script type="text/javascript" src="./js/jquery.js" ></script>
   <script type="text/javascript" src="./js/RetroJoyStick.js"></script>
-  <script type="text/javascript" src="./js/NyanCatSprite.js"></script>
+  <script type="text/javascript" src="./js/TyrannosaurusSprite.js"></script>
+  <script type="text/javascript" src="./js/QuetzalcoatlusSprite.js"></script>
 
   <script type="text/javascript">
     $(document).ready(function () {
 
       var retroJoyStick1 = new RetroJoyStick({
-        position: 'bottom_right'
+        position: 'bottom_right',
+        snapping: false
       });
 
       var retroJoyStick2 = new RetroJoyStick({
-        position: 'bottom_left'
+        position: 'bottom_left',
+        snapping: false
       });
 
-      var distance = 0;
-      var angle = 0;
+      var distance1 = 0;
+      var angle1 = 0;
       // When joystick has changed position
       retroJoyStick1.on('change', function () {
         // keep track of distance
-        distance = retroJoyStick1.distance
+        distance1 = retroJoyStick1.distance
         // keep track of angle
-        angle = retroJoyStick1.angle
+        angle1 = retroJoyStick1.angle
         // notate when angle / distance changes
-        $('#retrostick-data-table-angle').html(angle);
-        $('#retrostick-data-table-distance').html(distance);
+        $('#retrostick-data-table-angle').html(angle1);
+        $('#retrostick-data-table-distance').html(distance1);
       });
 
-      var nyanCat1 = new NyanCatSprite();
-      var nyanCat2 = new NyanCatSprite();
 
-      function animateCat() {
-        var nyanCatPos;
+      var distance2 = 0;
+      var angle2 = 0;
+      // When joystick has changed position
+      retroJoyStick2.on('change', function () {
+        // keep track of distance
+        distance2 = retroJoyStick2.distance
+        // keep track of angle
+        angle2 = retroJoyStick2.angle
+        // notate when angle / distance changes
+        $('#retrostick-data-table-angle').html(angle2);
+        $('#retrostick-data-table-distance').html(distance2);
+      });
 
-        // according to joystick1, how much should the nyan cat move?
+      var dinosaur1 = new TyrannosaurusSprite();
+      var dinosaur2 = new QuetzalcoatlusSprite();
+
+      function animateDinosaur() {
+
+        var dinosaurPos;
+
+        // according to joystick1, how much should the nyan dinosaur move?
         var positionAdjustment1 = retroJoyStick1.getPositionAdjustment();
         if (positionAdjustment1.x || positionAdjustment1.y) {
-          nyanCatPos = nyanCat1.position();
-          nyanCat1.css('left', nyanCatPos.left + (positionAdjustment1.x));
-          nyanCat1.css('top', nyanCatPos.top + (positionAdjustment1.y));
+          dinosaurPos = dinosaur1.position();
+          dinosaur1.css('left', dinosaurPos.left + (positionAdjustment1.x));
+          dinosaur1.css('top', dinosaurPos.top + (positionAdjustment1.y));
         }
 
-        // according to joystick2, how much should the nyan cat move?
+        // according to joystick2, how much should the nyan dinosaur move?
         var positionAdjustment2 = retroJoyStick2.getPositionAdjustment();
         if (positionAdjustment2.x || positionAdjustment2.y) {
-          nyanCatPos = nyanCat2.position();
-          nyanCat2.css('left', nyanCatPos.left + (positionAdjustment2.x));
-          nyanCat2.css('top', nyanCatPos.top + (positionAdjustment2.y));
+          dinosaurPos = dinosaur2.position();
+          dinosaur2.css('left', dinosaurPos.left + (positionAdjustment2.x));
+          dinosaur2.css('top', dinosaurPos.top + (positionAdjustment2.y));
         }
 
+        requestAnimationFrame(animateDinosaur);
       }
 
-      setInterval(animateCat, 25);
+      requestAnimationFrame(animateDinosaur);
 
       // For playing around with
       window.retroJoyStick1 = retroJoyStick1;

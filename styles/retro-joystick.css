@@ -1,3 +1,4 @@
+
 .retrostick {
   position: absolute;
   padding: 4px;
@@ -118,9 +119,9 @@
   background-color:red;
 }
 
-// Joystick positioning options.
-.retrostick-bottom-left{bottom:125px; left: 125px;}
-.retrostick-bottom-right{bottom:125px; right:125px;}
+
+.retrostick-bottom-left{position:absolute; bottom:25px !important; left:25px !important;}
+.retrostick-bottom-right{position:absolute; bottom:25px !important; right:25px !important;}
 .retrostick-top-left{top:125px; left:125px;}
 .retrostick-top-right{top:125px; right:125px;}
 

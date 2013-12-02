@@ -1,6 +1,7 @@
 body {
   background-color:#bebebe;
-  background: #0F6FA1 url(../assets/images/sky.jpg) bottom;
+  background: #0F6FA1 url(../assets/images/prehistoric_background.jpg) no-repeat bottom;
+  background-size: 100% 100%;
   overflow:hidden;
 }
 
@@ -849,4 +850,18 @@ a {
   -moz-transform: rotate(-45deg);
   -o-transform: rotate(-45deg);
   transform: rotate(-45deg);
+}
+
+.quetzalcoatlus {
+  position:absolute;
+  background:url(../assets/images/quetzalcoatlus.gif) no-repeat;
+  width:200px;
+  height:185px;
+}
+
+.tyrannosaurus {
+  position:absolute;
+  background:url(../assets/images/tyrannosaurus.gif) no-repeat;
+  width:200px;
+  height:185px;
 }
