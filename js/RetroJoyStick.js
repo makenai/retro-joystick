@@ -90,8 +90,8 @@ function RetroJoyStick(options) {
 
     // get the position of the joystick
     point = {
-      x: e.clientX - ballOffset.left + currentPos.left- clickOffset.left + ballRadius,
-      y: e.clientY - ballOffset.top + currentPos.top - clickOffset.top + ballRadius
+      x: e.pageX - ballOffset.left + currentPos.left- clickOffset.left + ballRadius,
+      y: e.pageY - ballOffset.top + currentPos.top - clickOffset.top + ballRadius
     };
 
     // publicize the distance from center
@@ -182,32 +182,68 @@ function RetroJoyStick(options) {
       self.publish('change');
     }
 
-    e.preventDefault();
+    if (e.preventDefault) e.preventDefault();
+  }
+
+  function handleRetroStickUp(e, isTouch) {
+    self.resetPosition();
+    if (isTouch) {
+      document.removeEventListener('touchmove', handleTouchRetroStickMove, false);
+    }
+    else {
+      document.removeEventListener('mousemove', handleRetroStickMove, false);
+    }
+  }
+
+  function handleTouchRetroStickMove(e) {
+    var touches = e.changedTouches;
+    for (var i = 0; i < touches.length; i++) {
+      handleRetroStickMove(touches[i], true);
+    }
+  }
+
+  function handleTouchRetroStickUp(e) {
+    var touches = e.changedTouches;
+    for (var i = 0; i < touches.length; i++) {
+      handleRetroStickUp(e, true);
+    }
   }
 
   // When we press down on the joystick ball.
-  function handleRetroStickPress(e) {
+  function handleRetroStickPress(e, isTouch) {
 
     // Notate some shit
     ballOffset = ball.offset();
     currentPos = ball.position();
-    clickOffset = {left: e.clientX - ballOffset.left, top: e.clientY - ballOffset.top};
+    clickOffset = {left: e.pageX - ballOffset.left, top: e.pageY - ballOffset.top};
 
     // Remove animation classes (from previous press)
     self._ball.removeClass('retrostick-ball-to-center');
     self._stick.removeClass('retrostick-stick-to-center');
 
-    doc.on('mousemove.retrostick', handleRetroStickMove);
+    if (isTouch) {
+      document.addEventListener('touchmove', handleTouchRetroStickMove, false);
+      document.addEventListener('touchend', handleTouchRetroStickUp, false);
 
-    doc.on('mouseup.retrostick', function () {
-      self.resetPosition();
-      doc.off('mousemove.retrostick');
-    });
+    }
+    else {
+      document.addEventListener('mousemove', handleRetroStickMove, false);
+      document.addEventListener('mouseup', handleRetroStickUp, false);
+    }
 
-    e.preventDefault();
+    if (e.preventDefault) e.preventDefault();
   }
 
-  ball.on('mousedown.retrostick', handleRetroStickPress);
+  ball[0].addEventListener('mousedown', handleRetroStickPress, false);
+
+  ball[0].addEventListener('touchstart', function (e) {
+    var touches = e.changedTouches;
+    for (var i = 0; i < touches.length; i++) {
+      handleRetroStickPress(touches[i], true);
+    }
+
+    e.preventDefault();
+  }, false);
 
 }
 
@@ -260,17 +296,11 @@ RetroJoyStick.prototype.insertJoystickMarkup = function () {
   ';
 
   if (this.position == 'bottom_left') {
-    $(wrap).css({
-      bottom: '25px',
-      left: '25px'
-    });;
+    $(wrap).addClass('retrostick-bottom-left');
   }
 
   if (this.position == 'bottom_right') {
-    $(wrap).css({
-      bottom: '25px',
-      right: '25px'
-    });;
+    $(wrap).addClass('retrostick-bottom-right');
   }
 
   document.body.appendChild(wrap);

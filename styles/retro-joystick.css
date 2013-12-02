@@ -119,8 +119,8 @@
 }
 
 // Joystick positioning options.
-.retrostick-bottom-left{bottom:25px; left: 25px;}
-.retrostick-bottom-right{bottom:25px; right:25px;}
-.retrostick-top-left{top:25px; left:25px;}
-.retrostick-top-right{top:25px; right:25px;}
+.retrostick-bottom-left{bottom:125px; left: 125px;}
+.retrostick-bottom-right{bottom:125px; right:125px;}
+.retrostick-top-left{top:125px; left:125px;}
+.retrostick-top-right{top:125px; right:125px;}
 
