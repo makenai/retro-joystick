@@ -50,7 +50,8 @@ API
       snapping: true, // false
       snappingPixels: 8, // pixels away from snapping point
       speedAdjustment: 0.08, // 1 = 1:1 pixels from maxDistanceFromCenter, when adjusting pixels.
-      maxDistanceFromCenter: 100 // how many pxiels away from the center of the joystick?
+      maxDistanceFromCenter: 100, // how many pxiels away from the center of the joystick?
+      container: document.getElementById('controls') // Where do we insert the joystick markup? (default: body)
     });
 
 Authors

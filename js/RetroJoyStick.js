@@ -36,6 +36,8 @@ function RetroJoyStick(options) {
 
   self.speedAdjustment = options.speedAdjustment || 0.08;
 
+  self.container = options.container || document.body;
+
   // @TODO:?
   // aerial or scrolling
   //
@@ -311,7 +313,7 @@ RetroJoyStick.prototype.insertJoystickMarkup = function () {
     $(wrap).addClass('retrostick-bottom-right');
   }
 
-  document.body.appendChild(wrap);
+  this.container.appendChild(wrap);
 
   this.publish('beforeInsert', wrap);
 
